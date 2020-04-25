@@ -15,11 +15,11 @@ Timer timer_tick, timer_clock, timer_color;
 int color_minute = 0;//根据分钟变化颜色
 uint32_t color = 0; //时钟颜色
 int last_show = 0; //控制2个点的显示
-int mode = 1; // 1 普通，2 彩虹
+int mode = 1; // 1 普通,2 彩虹,3调亮度,4熄灯
 
 int BRIGHT_VAL = 20; //亮度
 
-SoftwareSerial BTSerial(10, 11); //蓝牙读写
+//SoftwareSerial BTSerial(10, 11); //蓝牙读写
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(CLOCK_LED_NUMS, WS2812_PIN, NEO_GRB + NEO_KHZ800);
 
 
@@ -38,7 +38,7 @@ int updating = 0; //更新中不刷新，防止数据为更新完显示不完整
 
 void setup() {
   Serial.begin(9600); //9600（PC端使用）
-  BTSerial.begin(9600); //蓝牙频率
+  //  BTSerial.begin(9600); //蓝牙频率
 
   Wire.begin();//RTC时钟
 
@@ -67,12 +67,12 @@ void setup() {
 
 void loop() {
 
-  bluetoothListen();
+  //  bluetoothListen(); 太耗电了，不用控制颜色了
   timer_tick.update();
   timer_clock.update();
 }
-
-void bluetoothListen() {
+/**
+  void bluetoothListen() {
   if (BTSerial.available()) {
     char d = BTSerial.read();
     //    Serial.print(d);
@@ -132,7 +132,8 @@ void bluetoothListen() {
     }
     light_up();
   }
-}
+  }
+**/
 
 void light_adjust(int level) {
   int val = 0;
@@ -183,6 +184,14 @@ void showTimeNow() {
   int min1 = minute / 10;
   int min2 = minute % 10;
 
+  //  int second = now.second();
+  //  Serial.println(second);
+  if (hour < 6) {
+    mode = 4; //熄灯了
+  } else {
+    mode = 1;
+  }
+
   //  if (minute != color_minute) {
   //    color_minute = minute;
   //    changeColor();
@@ -203,6 +212,11 @@ void light_up() {
   }
   if (mode == 2) {
     light_rainbow();
+  }
+  if (mode == 4) {
+    strip.clear();
+    strip.show();
+    //    clearLights();
   }
 }
 
@@ -273,6 +287,13 @@ void append_array(int* a, int* b, int* c, int n1, int n2)
 }
 
 void showTick() {
+  if (mode == 4) { //熄灯了
+    strip.clear();
+    strip.show();
+    //    clearLights();
+    return;
+  }
+
   int tick1 = CLOCK_LED_NUMS - 2, tick2 = CLOCK_LED_NUMS - 1; //最后两个灯
 
   if (last_show == 1) {

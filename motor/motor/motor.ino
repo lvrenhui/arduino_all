@@ -5,11 +5,11 @@ int enA = 10; // 定义uno的pin 10 向 输出A使能端输出
 void setup() {   
    pinMode(input1,OUTPUT);
    pinMode(input2,OUTPUT);
-   pinMode(enA,OUTPUT);
+//   pinMode(enA,OUTPUT);
 }
 
 void loop() {
    digitalWrite(input1,HIGH); //给高电平
    digitalWrite(input2,LOW);  //给低电平
-   analogWrite(enA,100);
+//   analogWrite(enA,100);
  }
