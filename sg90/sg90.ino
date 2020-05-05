@@ -6,7 +6,7 @@ Servo myservo_land;
 Servo myservo_sky;
 
 int last_land = 90;
-int last_sky = 100;
+int last_sky = 150;
 
 #define left 1
 #define right  2
@@ -20,15 +20,15 @@ void setup()
 
   //init
   Serial.begin(9600);
-  myservo_land.write(90);
-  myservo_sky.write(90);
+  myservo_land.write(last_land);
+  myservo_sky.write(last_sky);
 
 }
 
 void move(int type) {
   Servo servo;
   int cur = 0;
-  int depth = 10;
+  int depth = 5;
   switch (type) {
     case left:
       servo = myservo_land;
@@ -57,8 +57,9 @@ void move(int type) {
     case up:
       servo = myservo_sky;
       cur = last_sky - depth;
-      if (cur <= 0) {
-        cur = 0;
+      //挡住了，不能再转了
+      if (cur <= 80) {
+        cur = 80;
       }
       last_sky = cur;
       break;
